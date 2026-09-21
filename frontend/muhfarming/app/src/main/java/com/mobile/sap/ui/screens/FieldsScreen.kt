@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
@@ -54,6 +53,7 @@ import com.mobile.sap.ui.components.*
 import com.mobile.sap.ui.viewmodel.FieldUiState
 import com.mobile.sap.ui.viewmodel.FieldViewModel
 import com.mobile.sap.ui.viewmodel.WeatherViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +81,7 @@ fun FieldsScreen(
     var isSelectingCoordinates by remember { mutableStateOf(false) }
     var selectedCoordinates by remember { mutableStateOf<List<com.mobile.sap.data.model.Coordinate>>(emptyList()) }
 
-    // Farm filter: null = "All farms" (show every field). Otherwise only fields
+    // Farm filter: null = "All farms" (show every field). Otherwise, only fields
     // on the selected farm are drawn.
     var selectedFarmFilterId by remember { mutableStateOf<Long?>(null) }
 
@@ -93,7 +93,7 @@ fun FieldsScreen(
 
     // Auto-hide info card after 2 seconds
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(2000.milliseconds)
         showInfoCard = false
     }
 
@@ -623,7 +623,7 @@ fun FieldsScreen(
                     },
                     onCancel = {
                         isSelectingCoordinates = false
-                        selectedCoordinates = emptyList<com.mobile.sap.data.model.Coordinate>()
+                        selectedCoordinates = emptyList()
                         // Trigger map update to restore fields
                         mapView?.getMapAsync { map ->
                             map.style?.let { style ->
@@ -648,7 +648,7 @@ fun FieldsScreen(
                         fieldToEdit = null
                         if (isSelectingCoordinates) {
                             isSelectingCoordinates = false
-                            selectedCoordinates = emptyList<com.mobile.sap.data.model.Coordinate>()
+                            selectedCoordinates = emptyList()
                             // Restore field polygons
                             mapView?.getMapAsync { map ->
                                 map.style?.let { style ->
@@ -669,7 +669,7 @@ fun FieldsScreen(
                         showAddFieldDialog = false
                         fieldToEdit = null
                         isSelectingCoordinates = false
-                        selectedCoordinates = emptyList<com.mobile.sap.data.model.Coordinate>()
+                        selectedCoordinates = emptyList()
                         // Restore field polygons
                         mapView?.getMapAsync { map ->
                             map.style?.let { style ->
@@ -1005,7 +1005,7 @@ fun CoordinateSelectionOverlay(
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Text("Cancel", fontWeight = FontWeight.Medium)
                 }
@@ -1326,7 +1326,7 @@ fun AddFieldDialog(
                                 }
 
                                 // Create or update field object
-                                val newField = com.mobile.sap.data.model.Field(
+                                val newField = Field(
                                     id = existingField?.id ?: java.util.UUID.randomUUID().toString(),
                                     name = fieldName.trim(),
                                     region = region,
@@ -1337,7 +1337,7 @@ fun AddFieldDialog(
                                 )
 
                                 onAddField(newField, farmId ?: 0L)
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 errorMessage = "Invalid coordinates format"
                             }
                         },
