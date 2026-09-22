@@ -593,8 +593,8 @@ fun FieldsScreen(
                 }
             }
 
-            // Add Field FAB for administrators
-            if (isAdmin && selectedField == null && !isSelectingCoordinates) {
+            // Add Field FAB — available to any authenticated user.
+            if (selectedField == null && !isSelectingCoordinates) {
                 FloatingActionButton(
                     onClick = {
                         isSelectingCoordinates = true

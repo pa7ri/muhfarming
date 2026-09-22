@@ -40,7 +40,7 @@ class AlertViewModel(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     // Selected region ids for the local filter. Null until first load so we can
-    // seed it with the regions of the user's own fields (the default).
+    // seed it with all regions (the default) — alerts are broadcast to everyone.
     private val _selectedRegionIds = MutableStateFlow<Set<Long>?>(null)
     val selectedRegionIds: StateFlow<Set<Long>?> = _selectedRegionIds.asStateFlow()
 
@@ -100,9 +100,11 @@ class AlertViewModel(
         repository.load().fold(
             onSuccess = { bundle ->
                 _uiState.value = AlertUiState.Success(bundle.alerts)
-                // Seed the filter with the user's field regions on first load only.
+                // Seed the filter to show all regions on first load: alerts are
+                // broadcast to every user, so none should be hidden by default.
+                // The region chips remain available to narrow the view.
                 if (_selectedRegionIds.value == null) {
-                    _selectedRegionIds.value = bundle.userFieldRegionIds
+                    _selectedRegionIds.value = CameroonRegions.regions.map { it.id }.toSet()
                 }
             },
             onFailure = { e ->

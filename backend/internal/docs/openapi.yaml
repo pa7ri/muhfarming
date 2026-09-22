@@ -713,6 +713,10 @@ paths:
     get:
       tags: [Alerts]
       summary: List alerts
+      description: >-
+        Returns all alerts. Alerts are broadcast: every authenticated user sees
+        every alert, regardless of role or field ownership. Creating, updating
+        and deleting alerts is restricted to admins.
       operationId: listAlerts
       responses:
         "200":

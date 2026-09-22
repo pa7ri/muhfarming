@@ -28,7 +28,8 @@ data class AlertView(
 
 /**
  * Bundle returned when loading the alerts screen: the joined alerts plus the
- * distinct region ids of the caller's fields (used as the default filter).
+ * distinct region ids of the caller's fields (available to callers that want to
+ * highlight the user's own regions).
  */
 data class AlertsBundle(
     val alerts: List<AlertView>,
@@ -36,10 +37,10 @@ data class AlertsBundle(
 )
 
 /**
- * Alerts data backed by the muhfarming backend. `GET /alerts` is scoped to the
- * caller's fields; region filtering is done client-side. Creating alerts is
- * admin-only on the backend (403 for farmers). The JWT is attached
- * automatically by the auth interceptor in [RetrofitClient].
+ * Alerts data backed by the muhfarming backend. `GET /alerts` returns all alerts
+ * (they are broadcast to every user); region filtering is done client-side.
+ * Creating alerts is admin-only on the backend (403 for farmers). The JWT is
+ * attached automatically by the auth interceptor in [RetrofitClient].
  */
 class AlertRepository(
     private val api: ApiService = RetrofitClient.apiService
