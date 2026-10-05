@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>muhfarming — Getting Started</title>
+<style>
+  :root {
+    --bg: #0f1912;
+    --bg-soft: #16241a;
+    --panel: #1b2e21;
+    --panel-2: #22402d;
+    --line: #2e4b38;
+    --text: #e7f3ea;
+    --muted: #9bb3a4;
+    --accent: #4ade80;
+    --accent-2: #38bdf8;
+    --admin: #f0b429;
+    --farmer: #4ade80;
+    --code-bg: #0c140e;
+    --radius: 16px;
+    --shadow: 0 18px 50px -20px rgba(0,0,0,.7);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #1d3a28 0%, transparent 55%),
+      radial-gradient(900px 500px at -10% 20%, #11261b 0%, transparent 50%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-2); }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  header.hero {
+    position: relative;
+    padding: 90px 20px 70px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--line);
+    padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  h1 {
+    font-size: clamp(34px, 6vw, 60px);
+    line-height: 1.05; margin: 0 0 16px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(100deg, #fff 10%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { font-size: clamp(16px, 2.3vw, 20px); color: var(--muted); max-width: 640px; margin: 0 auto 30px; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 12px; font-weight: 600; font-size: 15px;
+    text-decoration: none; cursor: pointer; border: 1px solid transparent;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn-primary { background: var(--accent); color: #06220f; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -8px rgba(74,222,128,.6); }
+  .btn-ghost { background: transparent; border-color: var(--line); color: var(--text); }
+  .btn-ghost:hover { background: var(--panel); transform: translateY(-2px); }
+
+  /* ---------- sticky progress nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(15,25,18,.82);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { display: flex; align-items: center; gap: 18px; padding: 12px 20px; max-width: 1040px; margin: 0 auto; overflow-x: auto; }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap; padding: 6px 2px; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+  .nav a:hover { color: var(--text); }
+  .nav a.active { color: var(--accent); border-color: var(--accent); }
+  .progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); z-index: 60; transition: width .1s linear; }
+
+  /* ---------- sections ---------- */
+  section { padding: 56px 0; border-top: 1px solid transparent; }
+  .section-head { margin-bottom: 28px; }
+  .section-head .kicker { color: var(--accent); font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+  .section-head h2 { font-size: clamp(26px, 4vw, 38px); margin: 6px 0 10px; letter-spacing: -0.01em; }
+  .section-head p { color: var(--muted); margin: 0; max-width: 680px; }
+
+  /* reveal animation */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- role cards ---------- */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
+  .role {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 24px;
+    position: relative; overflow: hidden;
+    transition: transform .25s ease, border-color .25s ease;
+  }
+  .role:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .role h3 { margin: 0 0 4px; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+  .pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+  .pill.admin { background: rgba(240,180,41,.15); color: var(--admin); border: 1px solid rgba(240,180,41,.35); }
+  .pill.farmer { background: rgba(74,222,128,.14); color: var(--farmer); border: 1px solid rgba(74,222,128,.35); }
+  .role ul { margin: 14px 0 0; padding-left: 0; list-style: none; }
+  .role li { padding: 7px 0 7px 26px; position: relative; color: var(--text); font-size: 14.5px; border-top: 1px solid rgba(255,255,255,.04); }
+  .role li:first-child { border-top: none; }
+  .role li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .role li.no::before { content: "✕"; color: #f87171; }
+  .role li.no { color: var(--muted); }
+
+  /* ---------- steps ---------- */
+  .steps { counter-reset: step; display: grid; gap: 20px; }
+  .step {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 26px 26px 26px 86px; position: relative; box-shadow: var(--shadow);
+  }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 22px; top: 24px;
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center; font-weight: 800; font-size: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #06220f;
+    box-shadow: 0 8px 20px -6px rgba(74,222,128,.6);
+  }
+  .step h3 { margin: 0 0 6px; font-size: 19px; }
+  .step .who { font-size: 12px; margin-left: 8px; vertical-align: middle; }
+  .step p { margin: 0 0 14px; color: var(--muted); }
+
+  /* ---------- code ---------- */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; overflow-x: auto; margin: 0; position: relative;
+    font-size: 13.5px; line-height: 1.55;
+  }
+  pre code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #d7e9dc; white-space: pre; }
+  .tok-method { color: var(--accent); font-weight: 700; }
+  .tok-url { color: var(--accent-2); }
+  .tok-key { color: #93c5fd; }
+  .tok-str { color: #fcd34d; }
+  .tok-cmt { color: #6b8b76; font-style: italic; }
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px; font-size: 11px; padding: 4px 10px;
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--muted);
+    border-radius: 7px; cursor: pointer; transition: all .15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.done { color: var(--accent); border-color: var(--accent); }
+
+  .note { background: rgba(56,189,248,.08); border: 1px solid rgba(56,189,248,.3); border-left: 4px solid var(--accent-2); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: #cfe8f5; margin-top: 14px; }
+  .note.warn { background: rgba(240,180,41,.08); border-color: rgba(240,180,41,.3); border-left-color: var(--admin); color: #f5e2b8; }
+
+  /* ---------- video ---------- */
+  .video-shell {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);
+  }
+  .dropzone {
+    border: 2px dashed var(--line); border-radius: 14px; padding: 48px 20px; text-align: center;
+    transition: all .25s ease; cursor: pointer; background: rgba(255,255,255,.015);
+  }
+  .dropzone.drag { border-color: var(--accent); background: rgba(74,222,128,.07); transform: scale(1.01); }
+  .dropzone svg { width: 46px; height: 46px; stroke: var(--accent); margin-bottom: 10px; }
+  .dropzone h4 { margin: 0 0 6px; font-size: 17px; }
+  .dropzone p { margin: 0; color: var(--muted); font-size: 14px; }
+  video { width: 100%; border-radius: 12px; margin-top: 4px; display: block; background: #000; }
+  .video-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .hidden { display: none !important; }
+
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 50px 20px 70px; border-top: 1px solid var(--line); margin-top: 30px; }
+
+  .diagram { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .node { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; font-weight: 600; font-size: 14px; }
+  .node small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; }
+  .arrow { color: var(--accent); font-size: 22px; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progress"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span> muhfarming · mixed-farming management</span>
+    <h1>Register, farm, and stay alert.</h1>
+    <p class="lead">A hands-on tour of muhfarming: create your account, set up farms and fields, and send &amp; receive hazard alerts — tailored to whether you're a <strong>Farmer</strong> or an <strong>Admin</strong>.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#register">Start the walkthrough ↓</a>
+      <a class="btn btn-ghost" href="#demo">Watch a demo</a>
+    </div>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner" id="navInner">
+    <a href="#roles">Roles</a>
+    <a href="#register">Register</a>
+    <a href="#farms">Farms</a>
+    <a href="#fields">Fields</a>
+    <a href="#alerts">Alerts</a>
+    <a href="#demo">Video demo</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ROLES -->
+  <section id="roles">
+    <div class="section-head reveal">
+      <div class="kicker">Who does what</div>
+      <h2>Two roles, two experiences</h2>
+      <p>muhfarming has exactly two roles. Everyone can read the shared data; what you can <em>write</em> depends on your role. The app and API enforce this for you.</p>
+    </div>
+    <div class="roles">
+      <div class="role reveal">
+        <h3>Farmer <span class="pill farmer">default</span></h3>
+        <ul>
+          <li>Self-register in seconds (signup always creates a Farmer)</li>
+          <li>Create &amp; manage their own farms</li>
+          <li>Add &amp; edit fields, coordinates and crops</li>
+          <li>Read all broadcast alerts</li>
+          <li class="no">Cannot create or edit alerts</li>
+          <li class="no">Cannot manage reference data or other users</li>
+        </ul>
+      </div>
+      <div class="role reveal">
+        <h3>Admin <span class="pill admin">privileged</span></h3>
+        <ul>
+          <li>Everything a Farmer can do — across <em>all</em> data, not just their own</li>
+          <li>Create &amp; broadcast alerts to every user</li>
+          <li>Manage reference data (regions, incidents, hazards, cultivations…)</li>
+          <li>Create and manage user accounts</li>
+          <li class="no">Admins are created by another admin — never via public signup</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note reveal">Reads for farmers are <strong>scoped to their own data</strong> (their farms, their fields). Admins see everything. Alerts are the exception — they're <strong>broadcast</strong>, so every authenticated user reads them.</div>
+  </section>
+
+  <!-- REGISTER -->
+  <section id="register">
+    <div class="section-head reveal">
+      <div class="kicker">Step 1</div>
+      <h2>Register &amp; sign in</h2>
+      <p>Public signup creates a Farmer account and returns a JWT token. Send that token as <code>Authorization: Bearer &lt;token&gt;</code> on every request after this.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Create a Farmer account <span class="pill farmer who">Farmer</span></h3>
+        <p>Username and password only. Password must be at least 6 characters.</p>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/auth/signup</span>
+<span class="tok-cmt"># Content-Type: application/json</span>
+{
+  <span class="tok-key">"username"</span>: <span class="tok-str">"jane"</span>,
+  <span class="tok-key">"password"</span>: <span class="tok-str">"secret6"</span>
+}
+
+<span class="tok-cmt"># → 201 Created</span>
+{
+  <span class="tok-key">"token"</span>: <span class="tok-str">"&lt;jwt&gt;"</span>,
+  <span class="tok-key">"role"</span>: <span class="tok-str">"Farmer"</span>
+}</code></pre>
+      </div>
+      <div class="step reveal">
+        <h3>Log in later</h3>
+        <p>Same body, same response. Tokens are valid for 24 hours.</p>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/auth/login</span>
+{
+  <span class="tok-key">"username"</span>: <span class="tok-str">"jane"</span>,
+  <span class="tok-key">"password"</span>: <span class="tok-str">"secret6"</span>
+}
+<span class="tok-cmt"># → 200 { "token": "...", "role": "Farmer" }</span></code></pre>
+      </div>
+      <div class="step reveal">
+        <h3>Need an Admin? <span class="pill admin who">Admin</span></h3>
+        <p>Admins can't be created through signup. An existing admin provisions them via the user-management endpoint.</p>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/users</span>  <span class="tok-cmt"># admin token required</span>
+{
+  <span class="tok-key">"username"</span>: <span class="tok-str">"boss"</span>,
+  <span class="tok-key">"password"</span>: <span class="tok-str">"secret6"</span>,
+  <span class="tok-key">"name"</span>: <span class="tok-str">"Alex"</span>,
+  <span class="tok-key">"email"</span>: <span class="tok-str">"alex@farm.io"</span>,
+  <span class="tok-key">"role"</span>: <span class="tok-str">"Admin"</span>
+}</code></pre>
+        <div class="note warn">Only <code>Admin</code> and <code>Farmer</code> are valid roles. Anything else is rejected by validation.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FARMS -->
+  <section id="farms">
+    <div class="section-head reveal">
+      <div class="kicker">Step 2</div>
+      <h2>Create a farm</h2>
+      <p>Any signed-in user can create a farm — it's automatically owned by you. All you need is a name.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Add your farm <span class="pill farmer who">Farmer</span> <span class="pill admin who">Admin</span></h3>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/farms</span>  <span class="tok-cmt"># Bearer token</span>
+{
+  <span class="tok-key">"name"</span>: <span class="tok-str">"North Farm"</span>
+}
+
+<span class="tok-cmt"># → 201 { "id": 1, "name": "North Farm", "userId": 7, ... }</span></code></pre>
+        <div class="note"><code>userId</code> is set from your token — you don't send it. Farmers see only their own farms when they <code>GET /farms</code>; admins see every farm.</div>
+      </div>
+      <div class="step reveal">
+        <h3>List your farms</h3>
+        <pre><code><span class="tok-method">GET</span> <span class="tok-url">http://localhost:8080/farms</span>       <span class="tok-cmt"># your farms (admin: all)</span>
+<span class="tok-method">GET</span> <span class="tok-url">http://localhost:8080/farms/1</span>     <span class="tok-cmt"># one farm</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIELDS -->
+  <section id="fields">
+    <div class="section-head reveal">
+      <div class="kicker">Step 3</div>
+      <h2>Add fields to a farm</h2>
+      <p>Fields belong to a farm and sit in a region. Farmers can now add their own fields directly — no admin needed.</p>
+    </div>
+    <div class="diagram reveal">
+      <div class="node">Farm <small>North Farm</small></div>
+      <div class="arrow">→</div>
+      <div class="node">Field <small>Plot A</small></div>
+      <div class="arrow">→</div>
+      <div class="node">Region <small>reference data</small></div>
+    </div>
+    <div class="steps" style="margin-top:22px">
+      <div class="step reveal">
+        <h3>Create a field <span class="pill farmer who">Farmer</span> <span class="pill admin who">Admin</span></h3>
+        <p>You'll need the <code>farmId</code> from step 2 and a <code>regionId</code>. List regions with <code>GET /regions</code>.</p>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/fields</span>  <span class="tok-cmt"># Bearer token</span>
+{
+  <span class="tok-key">"name"</span>: <span class="tok-str">"Plot A"</span>,
+  <span class="tok-key">"fieldNotes"</span>: <span class="tok-str">"clay soil, west slope"</span>,
+  <span class="tok-key">"farmId"</span>: 1,
+  <span class="tok-key">"regionId"</span>: 3
+}
+
+<span class="tok-cmt"># → 201 Created (field with nested farm + region)</span></code></pre>
+        <div class="note">Regions are reference data: everyone can <strong>read</strong> them, but only admins can create them. Pick an existing <code>regionId</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS -->
+  <section id="alerts">
+    <div class="section-head reveal">
+      <div class="kicker">Step 4</div>
+      <h2>Send &amp; retrieve alerts</h2>
+      <p>An alert links a <strong>field</strong> to an <strong>incident</strong> (the hazard) and is broadcast to everyone. Admins send them; all users read them.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Broadcast an alert <span class="pill admin who">Admin only</span></h3>
+        <p>Reference an existing field and an incident. The incident carries the hazard details.</p>
+        <pre><code><span class="tok-method">POST</span> <span class="tok-url">http://localhost:8080/alerts</span>  <span class="tok-cmt"># admin token required</span>
+{
+  <span class="tok-key">"fieldId"</span>: 5,
+  <span class="tok-key">"incidentId"</span>: 2
+}
+
+<span class="tok-cmt"># → 201 Created
+# A Farmer who POSTs here gets 403 "admin privileges required"</span></code></pre>
+      </div>
+      <div class="step reveal">
+        <h3>Retrieve alerts <span class="pill farmer who">Farmer</span> <span class="pill admin who">Admin</span></h3>
+        <p>Every authenticated user sees <em>all</em> alerts — regardless of who owns the field. Each alert comes with its field and incident preloaded.</p>
+        <pre><code><span class="tok-method">GET</span> <span class="tok-url">http://localhost:8080/alerts</span>       <span class="tok-cmt"># all alerts, broadcast</span>
+<span class="tok-method">GET</span> <span class="tok-url">http://localhost:8080/alerts/1</span>     <span class="tok-cmt"># one alert + field + incident</span></code></pre>
+        <div class="note">Because alerts are broadcast, a farmer sees hazard alerts even for fields they don't own — so the whole community stays informed.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO DEMO -->
+  <section id="demo">
+    <div class="section-head reveal">
+      <div class="kicker">See it in action</div>
+      <h2>Video demo</h2>
+      <p>Drop in a screen recording from your connected device — phone, tablet or laptop — and it plays right here. Nothing is uploaded; the video stays in your browser.</p>
+    </div>
+    <div class="video-shell reveal">
+      <div id="dropzone" class="dropzone">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4-4 4"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+        <h4>Add a demo video</h4>
+        <p>Tap to choose a file, or drag &amp; drop a recording here (.mp4, .mov, .webm)</p>
+        <input id="fileInput" type="file" accept="video/*" class="hidden" />
+      </div>
+      <video id="player" class="hidden" controls playsinline></video>
+      <div id="videoActions" class="video-actions hidden">
+        <button class="btn btn-ghost" id="replayBtn">↻ Replay</button>
+        <button class="btn btn-ghost" id="changeBtn">Choose another</button>
+      </div>
+      <div class="note" style="margin-top:16px">Tip: to ship a built-in demo, drop a file named <code>demo.mp4</code> next to this page and it will load automatically.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>muhfarming</strong> — mixed-farming management · API base <code>http://localhost:8080</code></p>
+    <p>Explore the full API at the backend's Swagger UI (<code>GET /</code>) and OpenAPI spec (<code>GET /openapi.yaml</code>).</p>
+  </div>
+</footer>
+
+<script>
+  // ----- scroll progress bar -----
+  const progress = document.getElementById('progress');
+  const onScroll = () => {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight);
+    progress.style.width = (scrolled * 100) + '%';
+  };
+  document.addEventListener('scroll', onScroll, { passive: true });
+
+  // ----- reveal on scroll -----
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ----- active nav highlight -----
+  const links = [...document.querySelectorAll('.nav a')];
+  const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+  const navIo = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = '#' + e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(s => s && navIo.observe(s));
+
+  // ----- copy buttons on code blocks -----
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code').innerText);
+        btn.textContent = 'Copied!'; btn.classList.add('done');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+      } catch { btn.textContent = 'Press ⌘/Ctrl+C'; }
+    });
+    pre.appendChild(btn);
+  });
+
+  // ----- video demo (upload from device) -----
+  const dz = document.getElementById('dropzone');
+  const input = document.getElementById('fileInput');
+  const player = document.getElementById('player');
+  const actions = document.getElementById('videoActions');
+  let currentURL = null;
+
+  function loadVideo(file) {
+    if (!file || !file.type.startsWith('video/')) return;
+    if (currentURL) URL.revokeObjectURL(currentURL);
+    currentURL = URL.createObjectURL(file);
+    player.src = currentURL;
+    dz.classList.add('hidden');
+    player.classList.remove('hidden');
+    actions.classList.remove('hidden');
+    player.play().catch(() => {});
+  }
+
+  dz.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => loadVideo(input.files[0]));
+
+  ['dragenter', 'dragover'].forEach(ev =>
+    dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev =>
+    dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop', e => loadVideo(e.dataTransfer.files[0]));
+
+  document.getElementById('replayBtn').addEventListener('click', () => { player.currentTime = 0; player.play(); });
+  document.getElementById('changeBtn').addEventListener('click', () => {
+    player.pause();
+    player.classList.add('hidden');
+    actions.classList.add('hidden');
+    dz.classList.remove('hidden');
+    input.value = '';
+  });
+
+  // ----- optional bundled demo.mp4 -----
+  fetch('demo.mp4', { method: 'HEAD' }).then(r => {
+    if (r.ok) {
+      player.src = 'demo.mp4';
+      dz.classList.add('hidden');
+      player.classList.remove('hidden');
+      actions.classList.remove('hidden');
+    }
+  }).catch(() => {});
+</script>
+</body>
+</html>
