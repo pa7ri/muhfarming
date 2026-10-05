@@ -29,8 +29,9 @@ type store interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-// scoped applies farmer ownership filtering. Admins see all cultivations;
-// farmers see only cultivations they grow.
+// scoped applies farmer ownership filtering to writes. Admins may modify any
+// cultivation; farmers are restricted to cultivations they grow. Reads are not
+// scoped — see GetByID/List below. (Writes are also admin-gated at the route.)
 func scoped(ctx context.Context, db *gorm.DB) *gorm.DB {
 	id, ok := auth.FromContext(ctx)
 	if ok && id.IsAdmin() {
@@ -39,9 +40,12 @@ func scoped(ctx context.Context, db *gorm.DB) *gorm.DB {
 	return db.Where("id IN (?)", scope.CultivationIDs(db, id.UserID))
 }
 
+// Reads are unscoped: cultivations are reference data (crop types) that back
+// the cultivation guide, which every authenticated user may read — like
+// hazards, fertilizers, and regions. Writes remain admin-only (route-gated).
 func (s *Store) GetByID(ctx context.Context, id int64) (*Cultivation, error) {
 	var c Cultivation
-	if err := scoped(ctx, s.db.WithContext(ctx)).First(&c, id).Error; err != nil {
+	if err := s.db.WithContext(ctx).First(&c, id).Error; err != nil {
 		return nil, fmt.Errorf("cultivation not found: %w", err)
 	}
 	return &c, nil
@@ -49,7 +53,7 @@ func (s *Store) GetByID(ctx context.Context, id int64) (*Cultivation, error) {
 
 func (s *Store) List(ctx context.Context) ([]Cultivation, error) {
 	var cultivations []Cultivation
-	if err := scoped(ctx, s.db.WithContext(ctx)).Find(&cultivations).Error; err != nil {
+	if err := s.db.WithContext(ctx).Find(&cultivations).Error; err != nil {
 		return nil, err
 	}
 	return cultivations, nil

@@ -60,8 +60,9 @@ fun NoRippleIconButton(
 
 /**
  * Wraps a row/card so it can be swiped from right-to-left (end→start) to
- * trigger [onDelete]. Reveals a red delete background with a trash icon while
- * swiping. Because deletion is destructive, [onDelete] is expected to open a
+ * trigger [onDelete]. The red delete background with a trash icon is revealed
+ * only while a left-swipe is in progress; at rest the row shows no delete
+ * affordance. Because deletion is destructive, [onDelete] is expected to open a
  * confirmation dialog rather than delete immediately; the item animates back
  * into place after the gesture so it stays visible until the user confirms.
  *
@@ -100,21 +101,26 @@ fun SwipeToDelete(
         state = state,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        MaterialTheme.colorScheme.error,
-                        RoundedCornerShape(12.dp)
+            // Only paint the red delete affordance while an end→start swipe is
+            // actually in progress; at rest it stays invisible so it never
+            // bleeds through rows that have a transparent background.
+            if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            MaterialTheme.colorScheme.error,
+                            RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.onError
                     )
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.onError
-                )
+                }
             }
         }
     ) {
