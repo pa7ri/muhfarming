@@ -63,6 +63,8 @@
   .hero-phone { justify-self: center; }
   .phone { width: 248px; aspect-ratio: 9/19; background: #10140f; border-radius: 34px; padding: 10px; box-shadow: 0 30px 60px -24px rgba(31,42,34,.55); border: 1px solid #000; }
   .phone .screen { width: 100%; height: 100%; border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, #dff0e2, #fffdf7 40%); position: relative; display: flex; flex-direction: column; }
+  .phone .hero-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .phone .hero-mock { display: flex; flex-direction: column; flex: 1; }
   .phone .status { height: 26px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink-soft); }
   .phone .screen-body { flex: 1; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--leaf-deep); }
   .phone .screen-body .big { font-size: 30px; }
@@ -185,17 +187,20 @@
     </div>
     <div class="hero-phone" aria-hidden="true">
       <div class="phone">
-        <div class="screen">
-          <div class="status ui">9:41</div>
-          <div class="screen-body ui">
-            <div>
-              <div class="big">🌾</div>
-              <strong>Muhfarming</strong>
-              <div style="font-size:12px;color:var(--ink-soft)">Smart agriculture, made simple</div>
+        <div class="screen" id="heroScreen">
+          <img class="hero-shot hidden" alt="" />
+          <div class="hero-mock">
+            <div class="status ui">9:41</div>
+            <div class="screen-body ui">
+              <div>
+                <div class="big">🌾</div>
+                <strong>Muhfarming</strong>
+                <div style="font-size:12px;color:var(--ink-soft)">Smart agriculture, made simple</div>
+              </div>
             </div>
-          </div>
-          <div class="bnav">
-            <span>☀️</span><span>🗺️</span><span>📖</span><span class="on">🔔</span><span>⚙️</span>
+            <div class="bnav">
+              <span>☀️</span><span>🗺️</span><span>📖</span><span class="on">🔔</span><span>⚙️</span>
+            </div>
           </div>
         </div>
       </div>
@@ -361,7 +366,7 @@
       </div>
     </div>
 
-    <div class="stepblock reveal" style="margin-top:34px">
+    <div class="stepblock reveal" style="margin-top:34px; grid-template-columns:1fr 1fr">
       <figure class="shot reveal">
         <div class="frame"><div class="ph" data-img="images/create-alert.png">
           <div class="label"><span class="cam">📷</span>Create alert<small>Drop <code>images/create-alert.png</code></small></div>
@@ -382,40 +387,26 @@
   <section id="demos">
     <div class="section-head reveal">
       <h2>See it end to end</h2>
-      <p>Two short recordings of the same moment from both sides: an admin raises an alert, and a farmer receives it. Add a clip from your device, or bundle one into the page.</p>
+      <p>Two short recordings of the same moment from both sides: an admin raises an alert, and a farmer receives it.</p>
     </div>
     <div class="videos">
-      <div class="vcard admin reveal" data-slot="admin" data-file="admin.mp4">
+      <div class="vcard admin reveal">
         <div class="vhead ui"><span class="vdot"></span><h3>Admin — sending an alert</h3><span class="vsub">creates &amp; broadcasts</span></div>
-        <div class="dropzone ui">
-          <span class="cam">🎬</span>
-          <h4>Add the admin demo</h4>
-          <p>Tap to choose, or drop a recording here (.mp4, .mov, .webm)</p>
-          <input type="file" accept="video/*" class="hidden" />
-        </div>
-        <video class="hidden" controls playsinline></video>
-        <div class="video-actions ui hidden">
-          <button class="btn btn-ghost replay">↻ Replay</button>
-          <button class="btn btn-ghost change">Choose another</button>
-        </div>
+        <video controls playsinline preload="metadata" poster="images/create-alert.png">
+          <source src="images/admin.mp4" type="video/mp4" />
+          Your browser can’t play this video.
+        </video>
       </div>
 
-      <div class="vcard farmer reveal" data-slot="farmer" data-file="farmer.mp4">
+      <div class="vcard farmer reveal">
         <div class="vhead ui"><span class="vdot"></span><h3>Farmer — receiving it</h3><span class="vsub">sees it arrive</span></div>
-        <div class="dropzone ui">
-          <span class="cam">🎬</span>
-          <h4>Add the farmer demo</h4>
-          <p>Tap to choose, or drop a recording here (.mp4, .mov, .webm)</p>
-          <input type="file" accept="video/*" class="hidden" />
-        </div>
-        <video class="hidden" controls playsinline></video>
-        <div class="video-actions ui hidden">
-          <button class="btn btn-ghost replay">↻ Replay</button>
-          <button class="btn btn-ghost change">Choose another</button>
-        </div>
+        <video controls playsinline preload="metadata" poster="images/alerts-list.png">
+          <source src="images/farmer.mp4" type="video/mp4" />
+          Your browser can’t play this video.
+        </video>
       </div>
     </div>
-    <div class="tip ui">To ship the demos with the page, drop <code>admin.mp4</code> and <code>farmer.mp4</code> next to this file and they'll load automatically.</div>
+    <div class="tip ui">Press play on either clip to watch the same alert flow from both sides.</div>
   </section>
 
 </main>
@@ -466,47 +457,18 @@
     img.src = src;
   });
 
-  // video slots
-  function wireSlot(card) {
-    const dz = card.querySelector('.dropzone');
-    const input = card.querySelector('input[type=file]');
-    const player = card.querySelector('video');
-    const actions = card.querySelector('.video-actions');
-    let url = null;
+  // hero: use images/home.png if present, otherwise keep the CSS mockup
+  (function () {
+    const screen = document.getElementById('heroScreen');
+    if (!screen) return;
+    const shot = screen.querySelector('.hero-shot');
+    const mock = screen.querySelector('.hero-mock');
+    const probe = new Image();
+    probe.onload = () => { shot.src = 'images/home.png'; shot.classList.remove('hidden'); mock.classList.add('hidden'); };
+    probe.src = 'images/home.png';
+  })();
 
-    function load(file) {
-      if (!file || !file.type.startsWith('video/')) return;
-      if (url) URL.revokeObjectURL(url);
-      url = URL.createObjectURL(file);
-      player.src = url;
-      dz.classList.add('hidden');
-      player.classList.remove('hidden');
-      actions.classList.remove('hidden');
-      player.play().catch(() => {});
-    }
-    function showFile(src) {
-      player.src = src;
-      dz.classList.add('hidden');
-      player.classList.remove('hidden');
-      actions.classList.remove('hidden');
-    }
-
-    dz.addEventListener('click', () => input.click());
-    input.addEventListener('change', () => load(input.files[0]));
-    ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
-    ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
-    dz.addEventListener('drop', e => load(e.dataTransfer.files[0]));
-    card.querySelector('.replay').addEventListener('click', () => { player.currentTime = 0; player.play(); });
-    card.querySelector('.change').addEventListener('click', () => {
-      player.pause(); player.classList.add('hidden'); actions.classList.add('hidden');
-      dz.classList.remove('hidden'); input.value = '';
-    });
-
-    // auto-load bundled file if present
-    const f = card.getAttribute('data-file');
-    if (f) fetch(f, { method: 'HEAD' }).then(r => { if (r.ok) showFile(f); }).catch(() => {});
-  }
-  document.querySelectorAll('.vcard').forEach(wireSlot);
+  // Videos are bundled (images/admin.mp4, images/farmer.mp4) and play inline.
 </script>
 </body>
 </html>
